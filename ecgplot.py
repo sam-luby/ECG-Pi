@@ -2,7 +2,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-signal_length = 1024
+signal_length = 1000
 # file = 'ecgresults.txt'
 file = 'ecg.txt'
 

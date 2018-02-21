@@ -3,7 +3,6 @@ import numpy as np
 import scipy.signal
 import scipy.ndimage
 
-
 def detect_beats(ecg, rate, ransac_window_size=5.0,lowfreq=5.0, highfreq=15.0):
     ransac_window_size = int(ransac_window_size * rate)
     lowpass = scipy.signal.butter(1, highfreq / (rate / 2.0), 'low')
