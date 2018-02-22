@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-import filtering as filt
+import sample_butterworths as filt
 import numpy as np
 
 file = 'ecg.txt'
