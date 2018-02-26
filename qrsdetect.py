@@ -1,71 +1,88 @@
-import sys
+import pandas as pd
+import matplotlib.pyplot as plt
 import numpy as np
-import scipy.signal
-import scipy.ndimage
+import math
+from scipy.signal import butter, lfilter
 
-def detect_beats(ecg, rate, ransac_window_size=5.0,lowfreq=5.0, highfreq=15.0):
-    ransac_window_size = int(ransac_window_size * rate)
-    lowpass = scipy.signal.butter(1, highfreq / (rate / 2.0), 'low')
-    highpass = scipy.signal.butter(1, lowfreq / (rate / 2.0), 'high')
-    # TODO: Could use an actual bandpass filter
-    ecg_low = scipy.signal.filtfilt(*lowpass, x=ecg)
-    ecg_band = scipy.signal.filtfilt(*highpass, x=ecg_low)
+measures = {}
 
-    # Square (=signal power) of the first difference of the signal
-    decg = np.diff(ecg_band)
-    decg_power = decg ** 2
 
-    # Robust threshold and normalizator estimation
-    thresholds = []
-    max_powers = []
-    for i in range(int(len(decg_power) / ransac_window_size)):
-        sample = slice(i * ransac_window_size, (i + 1) * ransac_window_size)
-        d = decg_power[sample]
-        thresholds.append(0.5 * np.std(d))
-        max_powers.append(np.max(d))
+def get_data(filename):
+    dataset = pd.read_csv(filename)
+    return dataset
 
-    threshold = np.median(thresholds)
-    max_power = np.median(max_powers)
-    decg_power[decg_power < threshold] = 0
 
-    decg_power /= max_power
-    decg_power[decg_power > 1.0] = 1.0
-    square_decg_power = decg_power ** 2
+def rolmean(dataset, hrw, fs):
+    mov_avg = pd.rolling_mean(dataset.hart, window=int(hrw * fs))
+    avg_hr = (np.mean(dataset.hart))
+    mov_avg = [avg_hr if math.isnan(x) else x for x in mov_avg]
+    # mov_avg = [x * 1.2 for x in mov_avg]
+    dataset['hart_rollingmean'] = mov_avg
 
-    shannon_energy = -square_decg_power * np.log(square_decg_power)
-    shannon_energy[~np.isfinite(shannon_energy)] = 0.0
 
-    mean_window_len = int(rate * 0.125 + 1)
-    lp_energy = np.convolve(shannon_energy, [1.0 / mean_window_len] * mean_window_len, mode='same')
-    # lp_energy = scipy.signal.filtfilt(*lowpass2, x=shannon_energy)
+def detect_peaks(dataset):
+    window = []
+    peaklist = []
+    listpos = 0
+    for datapoint in dataset.hart:
+        rollingmean = dataset.hart_rollingmean[listpos]
+        if (datapoint <= rollingmean) and (len(window) <= 1): #Here is the update in (datapoint <= rollingmean)
+            listpos += 1
+        elif (datapoint > rollingmean):
+            window.append(datapoint)
+            listpos += 1
+        else:
+            maximum = max(window)
+            beatposition = listpos - len(window) + (window.index(max(window)))
+            peaklist.append(beatposition)
+            window = []
+            listpos += 1
+    measures['peaklist'] = peaklist
+    measures['ybeat'] = [dataset.hart[x] for x in peaklist]
 
-    lp_energy = scipy.ndimage.gaussian_filter1d(lp_energy, rate / 8.0)
-    lp_energy_diff = np.diff(lp_energy)
+def calc_RR(dataset, fs):
+    RR_list = []
+    peaklist = measures['peaklist']
+    cnt = 0
+    while (cnt < (len(peaklist) - 1)):
+        RR_interval = (peaklist[cnt + 1] - peaklist[cnt])
+        ms_dist = ((RR_interval / fs) * 1000.0)
+        RR_list.append(ms_dist)
+        cnt += 1
+    measures['RR_list'] = RR_list
 
-    zero_crossings = (lp_energy_diff[:-1] > 0) & (lp_energy_diff[1:] < 0)
-    zero_crossings = np.flatnonzero(zero_crossings)
-    zero_crossings -= 1
-    return zero_crossings
 
-def plot_peak_detection(ecg, rate):
+def calc_bpm():
+    RR_list = measures['RR_list']
+    measures['bpm'] = 60000 / np.mean(RR_list)
 
-    import matplotlib.pyplot as plt
-    dt = 1.0 / rate
-    t = np.linspace(0, len(ecg) * dt, len(ecg))
-    plt.plot(t, ecg)
 
-    peak_i = detect_beats(ecg, rate)
-    plt.scatter(t[peak_i], ecg[peak_i], color='red')
+def plotter(dataset, title):
+    peaklist = measures['peaklist']
+    ybeat = measures['ybeat']
+    plt.title(title)
+    plt.plot(dataset.hart, alpha=0.5, color='blue', label="raw signal")
+    plt.plot(dataset.hart_rollingmean, color='green', label="moving average")
+    plt.scatter(peaklist, ybeat, color='red', label="average: %.1f BPM" % measures['bpm'])
+    plt.legend(loc=4, framealpha=0.6)
     plt.show()
 
 
-if __name__ == '__main__':
-    rate = float(sys.argv[1])
+def process(dataset, hrw,
+            fs):  # Remember; hrw was the one-sided window size (we used 0.75) and fs was the sample rate (file is recorded at 100Hz)
+    rolmean(dataset, hrw, fs)
+    detect_peaks(dataset)
+    calc_RR(dataset, fs)
+    calc_bpm()
+    plotter(dataset, "My Heartbeat Plot")
 
-    ecg = np.loadtxt(sys.stdin)
-    if len(sys.argv) > 2 and sys.argv[2] == 'plot':
-        plot_peak_detection(ecg, rate)
-    else:
-        peaks = detect_beats(ecg, rate)
-        sys.stdout.write("\n".join(map(str, peaks)))
-    sys.stdout.write("\n")
+def butter_lowpass(cutoff, fs, order=5):
+        nyq = 0.5 * fs  # Nyquist frequeny is half the sampling frequency
+        normal_cutoff = cutoff / nyq
+        b, a = butter(order, normal_cutoff, btype='low', analog=False)
+        return b, a
+
+def butter_lowpass_filter(data, cutoff, fs, order):
+        b, a = butter_lowpass(cutoff, fs, order=order)
+        y = lfilter(b, a, data)
+        return y

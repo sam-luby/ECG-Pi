@@ -1,33 +1,25 @@
+import qrsdetect as hb #Assuming we named the file 'heartbeat.py'
 import matplotlib.pyplot as plt
-import sample_butterworths as filt
-import numpy as np
 
-file = 'ecg.txt'
+dataset = hb.get_data("data2.csv")
+hb.process(dataset, 0.75, 100)
 
+bpm = hb.measures['bpm']
 
-with open(file) as file_object:
-    lines = file_object.readlines()
+dataset = hb.get_data('data2.csv')
+dataset = dataset[6000:12000].reset_index(drop=True) #For visibility take a subselection of the entire signal from samples 6000 - 12000 (00:01:00 - 00:02:00)
 
-for i, line in enumerate(lines):
-        lines[i] = float(line.strip())
-        line = float(line.strip())
+filtered = hb.butter_lowpass_filter(dataset.hart, 2.5, 100.0, 5)#filter the signal with a cutoff at 2.5Hz and a 5th order Butterworth filter
 
-fs = 256
-T = 5.0         # seconds
-n = int(T * fs) # total number of samples
-t = np.linspace(0, T, n, endpoint=False)
-
-
-filter = filt.butter_bandpass(lines, 5, 15, 256, 5)
-# filter = filt.butter_filter(lines, 20, fs, 'high', 3)
-
-plt.subplot(2, 1, 2)
-plt.plot(t[1:n], lines[1:n], 'b-', label='data')
-plt.plot(t[1:n], filter[1:n], 'g-', linewidth=2, label='filtered data')
-plt.xlabel('Time [sec]')
-plt.grid()
-plt.legend()
-
-plt.subplots_adjust(hspace=0.35)
+#Plot it
+plt.subplot(211)
+plt.plot(dataset.hart, color='Blue', alpha=0.5, label='Original Signal')
+plt.legend(loc=4)
+plt.subplot(212)
+plt.plot(filtered, color='Red', label='Filtered Signal')
+plt.ylim(200,800) #limit filtered signal to have same y-axis as original (filter response starts at 0 so otherwise the plot will be scaled)
+plt.legend(loc=4)
 plt.show()
 
+#To view all objects in the dictionary, use "keys()" like so:
+# print(hb.measures.keys())
