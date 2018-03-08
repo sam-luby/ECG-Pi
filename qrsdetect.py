@@ -19,7 +19,7 @@ def get_dataset(filename):
 # preprocessing to scale data to allow different data sources
 def data_scaling(dataset):
     range = np.max(dataset) - np.min(dataset)
-    dataset = 4096*((dataset - np.min(dataset)) / range)
+    dataset = 1024*((dataset - np.min(dataset)) / range)
     return dataset
 
 
@@ -29,7 +29,7 @@ def moving_average(dataset, hrw, fs):
     mov_avg = pd.rolling_mean(dataset.ecgdat, window=int(hrw * fs))
     avg_heart_rate = (np.mean(dataset.ecgdat))
     mov_avg = [avg_heart_rate if math.isnan(x) else x for x in mov_avg]
-    mov_avg = [x * 1.1 for x in mov_avg]
+    mov_avg = [x * 1.75 for x in mov_avg]
     dataset['ecgdat_moving_avg'] = mov_avg
 
 
@@ -47,7 +47,6 @@ def detect_R_peaks(dataset):
             window.append(ecg_val)
             count += 1
         else:
-            # maximum = max(window)
             beatposition = count - len(window) + (window.index(max(window)))
             R_peak_locations.append(beatposition)
             window = []
