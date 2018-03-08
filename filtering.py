@@ -45,9 +45,6 @@ t = np.linspace(0, T, n, endpoint=False)
 # plt.subplot(2, 1, 1)
 # ax.plot(xf, 2.0/n* np.abs(yf[:n//2]))
 
-
-
-
 plt.subplot(2, 1, 2)
 plt.plot(t[1:n], lines[1:n], 'b-', label='noisy')
 plt.plot(t[1:n], filtered_signal[1:n], 'r-', linewidth=2, label='filtered data')

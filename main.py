@@ -1,25 +1,30 @@
-import qrsdetect as hb #Assuming we named the file 'heartbeat.py'
+import qrsdetect as ecg
 import matplotlib.pyplot as plt
 
-dataset = hb.get_data("data2.csv")
-hb.process(dataset, 0.75, 100)
+#dataset is recorded at 100Hz
+dataset = ecg.get_dataset("data2.csv")
+dataset = dataset[6000:8000].reset_index(drop=True)
+# dataset = ecg.data_scaling(dataset)
 
-bpm = hb.measures['bpm']
+ecg.process_data(dataset, 1, 100)
+ecg.plot_processed_ecg(dataset)
+print("Average heart rate for displayed ECG data: %.2f BPM" % ecg.ecg_results['bpm'])
 
-dataset = hb.get_data('data2.csv')
-dataset = dataset[6000:12000].reset_index(drop=True) #For visibility take a subselection of the entire signal from samples 6000 - 12000 (00:01:00 - 00:02:00)
+#filter signal with 5 order lowpass filter [fc = 2.5Hz, fs = 100Hz, order = 5]
+filtered = ecg.butterworth_lowpass_filter(dataset.ecgdat, 2.5, 100.0, 5)
 
-filtered = hb.butter_lowpass_filter(dataset.hart, 2.5, 100.0, 5)#filter the signal with a cutoff at 2.5Hz and a 5th order Butterworth filter
-
-#Plot it
+#Plots
 plt.subplot(211)
-plt.plot(dataset.hart, color='Blue', alpha=0.5, label='Original Signal')
+plt.plot(dataset.ecgdat, color='Blue', alpha=0.5, label='Original Signal')
 plt.legend(loc=4)
 plt.subplot(212)
 plt.plot(filtered, color='Red', label='Filtered Signal')
-plt.ylim(200,800) #limit filtered signal to have same y-axis as original (filter response starts at 0 so otherwise the plot will be scaled)
+plt.ylim(400,600)
 plt.legend(loc=4)
 plt.show()
 
-#To view all objects in the dictionary, use "keys()" like so:
-# print(hb.measures.keys())
+#objects in dictionary
+print(ecg.ecg_results.keys())
+print("R Peak X [Time] Locations:", ecg.ecg_results['R_peak_X_locations'])
+print("R Peak Y [Amplitude]:", ecg.ecg_results['R_peak_Y_locations'])
+print("RR Intervals [milliseconds]", ecg.ecg_results['RR_list'])
