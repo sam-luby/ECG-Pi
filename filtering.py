@@ -6,7 +6,7 @@ from scipy.signal import butter, lfilter
 import matplotlib.pyplot as plt
 import numpy as np
 
-file = 'ecg.txt'
+file = 'sample-data/ecg.txt'
 with open(file) as file_object:
     lines = file_object.readlines()
 

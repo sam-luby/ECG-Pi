@@ -18,7 +18,7 @@ ecg.plot_processed_ecg(dataset)
 print("Average heart rate for displayed ECG data: %.2f BPM" % ecg.ecg_results['bpm'])
 
 #filter signal with 5 order lowpass filter [fc = 2.5Hz, fs = 100Hz, order = 5]
-filtered = ecg.butterworth_lowpass_filter(dataset.ecgdat, 2.5, 100.0, 5)
+filtered = ecg.butterworth_lowpass_filter(dataset.ecgdat, 2.5, 10-0.0, 5)
 
 #plot signal vs filtered signal
 plt.subplot(211)

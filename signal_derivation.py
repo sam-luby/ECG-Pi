@@ -3,7 +3,7 @@ import scipy.signal as signal
 import matplotlib.pyplot as plt
 
 
-file = 'ecg.txt'
+file = 'sample-data/ecg.txt'
 with open(file) as file_object:
     lines = file_object.readlines()
 
@@ -19,7 +19,6 @@ T = 1/fs
 h = [-1., -2., 0., 2., 1.]
 filtered_signal = signal.convolve(lines, h)
 filtered_signal = filtered_signal**2
-
 
 # plt.plot(filtered_signal[1:5000])
 # plt.show()
