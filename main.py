@@ -2,12 +2,12 @@ import qrsdetect as ecg
 import matplotlib.pyplot as plt
 
 #data2 is recorded at 100Hz
-file = "data2.csv"
+file = "sample-data/data2.csv"
 dataset = ecg.get_dataset(file)
 
 
 # ignore
-if (file == "data2.csv"):
+if (file == "sample-data/data2.csv"):
     dataset = dataset[6000:8000].reset_index(drop=True)
 
 # preprocessing (scaling)
