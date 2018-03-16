@@ -106,6 +106,7 @@ def butterworth_lowpass_coeff(cutoff, fs, order=5):
         b, a = butter(order, normal_cutoff, btype='low', analog=False)
         return b, a
 
+
 def butterworth_lowpass_filter(data, cutoff, fs, order):
         b, a = butterworth_lowpass_coeff(cutoff, fs, order=order)
         y = lfilter(b, a, data)
