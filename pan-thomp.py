@@ -38,7 +38,7 @@ def data_scaling(dataset):
 
 
 lines = data_scaling(lines)
-data = lines[2000:4000]
+data = lines[2000:5000]
 # data = pd.DataFrame(data, columns=['ecgdata'])
 
 ## Add some noise
@@ -62,16 +62,17 @@ B, A = butter(2, fc_low / nyq, btype='low') #2nd order BW LowPassFilter
 filtered_signal = lfilter(B, A, noisy_signal, axis=0)
 B, A = butter(2, fc_high / nyq,  btype='high') #2nd order BW HighPassFilter
 filtered_signal = lfilter(B, A, filtered_signal, axis=0)
+
+# some amplification
 filtered_signal = filtered_signal*10
 
 n = len(filtered_signal)
-Ts = 1/n
 t = np.linspace(0, T, n, endpoint=False)
 
 # Plot input signal & filtered signal
 plt.subplot(2, 1, 1)
-plt.plot(t[1:n], noisy_signal[1:n], 'b-', label='noisy')
-plt.plot(t[1:n], filtered_signal[1:n], 'r-', linewidth=2, label='filtered data')
+plt.plot(t[1:n], noisy_signal[1:n], 'b-', linewidth = 0.5, label='noisy')
+plt.plot(t[1:n], filtered_signal[1:n], 'r-', linewidth=1, label='filtered data')
 plt.xlabel('Time [sec]')
 plt.grid()
 plt.legend()
@@ -103,7 +104,7 @@ mov_avg = moving_average(derivated_signal, 1, fs)
 
 plt.subplot(2, 1, 2)
 # plt.plot(t[1:n], filtered_signal[1:n], 'b-', label='data')
-plt.plot(t[1:n], derivated_signal[1:n], 'g-', linewidth=2, label='Derivated Signal')
+plt.plot(t[1:n], derivated_signal[1:n], 'g-', linewidth=1, label='Derivated Signal')
 plt.plot(t[1:n], mov_avg[1:n], 'r-', label='Moving Average')
 plt.xlabel('Time [sec]')
 plt.grid()
