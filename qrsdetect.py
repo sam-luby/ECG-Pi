@@ -91,7 +91,7 @@ def plot_processed_ecg(dataset):
 
 
 # hrw = one-sided window size
-# fs = sampling rate (100Hz for sample data)
+# fs = sampling rate (250Hz for sample data)
 def process_data(dataset, hrw, fs):
     moving_average(dataset, hrw, fs)
     detect_R_peaks(dataset)

@@ -31,7 +31,7 @@ def data_scaling(dataset):
 
 
 data = data_scaling(lines)
-data = data[2000:8000].reset_index()
+data = data[2000:4000].reset_index()
 
 ## Add some noise
 data['noise'] = data['ecgdat'] + np.random.normal(0, 0.75, len(data))
@@ -40,7 +40,7 @@ data['noise'] = data['ecgdat'] + np.random.normal(0, 0.75, len(data))
 ############################
 #     Signal Filtering     #
 ############################
-fs = 250
+fs = 150
 nyq = 0.5 * fs
 # T = 40.0         # seconds
 T = (1/fs)*len(lines)
@@ -86,10 +86,10 @@ def moving_average(data, hrw, fs):
     avg_heart_rate = np.mean(data)
     mov_avg = [avg_heart_rate if math.isnan(x) else x for x in mov_avg]
     # print(mov_avg)
-    return [1000 + x * 3 for x in mov_avg]
+    return [1000 + x * 2.5 for x in mov_avg]
 
 
-data['avg'] = moving_average(data['derivated'], 0.15, fs)
+data['avg'] = moving_average(data['derivated'], 0.125, fs)
 # print(data[0:10])
 
 
@@ -153,8 +153,8 @@ calculate_bpm()
 
 plt.subplot(2, 1, 2)
 # plt.plot(t[1:n], data['filtered'][1:n], 'b-', label='data')
-plt.plot(data['derivated'], 'b-', linewidth=1, label='Derivated Signal')
-plt.plot( data['avg'], 'g-', label='Moving Average')
+plt.plot(data['derivated'], 'b-', linewidth=1)
+plt.plot( data['avg'], 'g-')
 plt.scatter(results['R_peak_X_locations'], results['R_peak_Y_locations'], color='red', label="Average heart rate: %.2f BPM" % results['bpm'])
 plt.xlabel('Time [sec]')
 plt.grid()
