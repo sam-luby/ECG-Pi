@@ -1,13 +1,15 @@
 import pan_thomp as pt
 import numpy as np
+import from_arduino as ard
 import pandas as pd
-
 
 
 ##############
 #    Main    #
 ##############
-file_name = 'sample-data/ecgdata2min.csv'
+
+ard.get_data_from_arduino(30)
+file_name = 'sample-data/output.csv'
 lines = pt.open_data_file(file_name)
 data = pt.data_scaling(lines)
 data = data[0:5000].reset_index()

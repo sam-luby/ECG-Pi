@@ -17,7 +17,7 @@ results = {}
 # open file and return data
 def open_data_file(file):
     with open(file) as file_object:
-        # next(file_object)
+        next(file_object)
         lines = file_object.readlines()
     for i, line in enumerate(lines):
         lines[i] = float(line.strip())
