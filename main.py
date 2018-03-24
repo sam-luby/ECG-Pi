@@ -10,25 +10,14 @@ import os
 ##############
 T = 30
 fs = 250
+fc_low = 5
+fc_high = 15
+file_name = 'sample-data/output.csv'
 
 ##############
 #    Main    #
 ##############
-ard.get_data_from_arduino(T)
-file_name = 'sample-data/output.csv'
-lines = pt.open_data_file(file_name)
-data = pt.data_scaling(lines)
-# data = data[0:5000].reset_index()
-
-## Add some noise
-data['noise'] = data['ecgdat'] + np.random.normal(0, 0.75, len(data))
-data['filtered'] = pt.filter_signal(data['noise'], 15, 5, 250)
-n, t = pt.get_interval(fs, lines, data)
-pt.plot_input_and_filtered(data['ecgdat'], data['filtered'], n, t)
-data['derivated'] = pt.derivate_signal(data['filtered'], n)
-data['avg'] = pt.moving_average(data['derivated'], 0.125, fs)
-pt.detect_R_peaks(data)
-pt.calculate_RR_intervals(fs)
-pt.calculate_bpm()
-pt.plot_derivated_and_peaks(data['derivated'], data['avg'], n, t)
+Nsamp = ard.get_data_from_arduino(T)                        # Gets ECG data from Arduino for T seconds
+samples_to_plot = Nsamp                                     # Number of samples to plot
+pt.run_pan_thomp(file_name, fs, fc_high, fc_low, Nsamp)     # Run Pan Thompkins algorithm on collected ECG data
 os.remove(file_name)

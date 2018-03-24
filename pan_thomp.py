@@ -127,7 +127,9 @@ def plot_input_and_filtered(input, filtered, n ,t):
     plt.legend()
     plt.show()
 
+
 # TODO Scale RPeak Y Locations (so I can use seconds as X axis)
+# Plots derivated signal and rolling mean, also adds QRS peaks
 def plot_derivated_and_peaks(derivated, avg, n ,t):
     plt.plot(derivated[1:n], 'b-', linewidth=1, label='Derivated Signal', zorder=1)
     plt.plot(avg[1:n], 'g-', label='Moving Average', zorder=2)
@@ -136,3 +138,20 @@ def plot_derivated_and_peaks(derivated, avg, n ,t):
     plt.grid()
     plt.legend(loc='upper center', bbox_to_anchor=(0.9, 1.175), fancybox=True, framealpha=1, shadow=True)
     plt.show()
+
+
+# does all the stuff
+def run_pan_thomp(file, fs, fc_high, fc_low, Nsamp):
+    lines = open_data_file(file)
+    data = data_scaling(lines)
+    data = data[0:Nsamp].reset_index()
+    data['noise'] = data['ecgdat'] + np.random.normal(0, 0.75, len(data))
+    data['filtered'] = filter_signal(data['noise'], fc_high, fc_low, fs)
+    n, t = get_interval(fs, lines, data)
+    plot_input_and_filtered(data['ecgdat'], data['filtered'], n, t)
+    data['derivated'] = derivate_signal(data['filtered'], n)
+    data['avg'] = moving_average(data['derivated'], 0.125, fs)
+    detect_R_peaks(data)
+    calculate_RR_intervals(fs)
+    calculate_bpm()
+    plot_derivated_and_peaks(data['derivated'], data['avg'], n, t)

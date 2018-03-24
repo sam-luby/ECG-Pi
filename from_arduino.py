@@ -4,10 +4,6 @@ import serial
 import time
 import pandas as pd
 
-# TODO Maybe check Length of CSV file. when == 10ksamp or whatever, read, delete.
-# TODO Maybe paired files to read/write simultaneously, switch when = Nsamp
-
-
 def get_data_from_arduino(T):                        # arg (T) is how long to record for
     print("Recording ECG data for {} seconds.".format(T))
     FS = 250                                         # sampling rate [set by arduino, dont change]
@@ -30,5 +26,7 @@ def get_data_from_arduino(T):                        # arg (T) is how long to re
                 print("Collecting data, {}% complete.".format(percentage))
                 percentage+=10
     # print(len(dat))
+    print("Recording complete, processing ECG data...")
     dat = pd.DataFrame(dat)
     dat.to_csv("sample-data/output.csv", index=False)
+    return Nsamp
