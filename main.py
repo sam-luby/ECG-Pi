@@ -2,18 +2,23 @@ import pan_thomp as pt
 import numpy as np
 import from_arduino as ard
 import pandas as pd
+import os
 
+
+##############
+#   Params   #
+##############
+T = 30
+fs = 250
 
 ##############
 #    Main    #
 ##############
-
-ard.get_data_from_arduino(30)
+ard.get_data_from_arduino(T)
 file_name = 'sample-data/output.csv'
 lines = pt.open_data_file(file_name)
 data = pt.data_scaling(lines)
-data = data[0:5000].reset_index()
-fs = 250
+# data = data[0:5000].reset_index()
 
 ## Add some noise
 data['noise'] = data['ecgdat'] + np.random.normal(0, 0.75, len(data))
@@ -26,3 +31,4 @@ pt.detect_R_peaks(data)
 pt.calculate_RR_intervals(fs)
 pt.calculate_bpm()
 pt.plot_derivated_and_peaks(data['derivated'], data['avg'], n, t)
+os.remove(file_name)

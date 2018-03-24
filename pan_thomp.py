@@ -129,9 +129,9 @@ def plot_input_and_filtered(input, filtered, n ,t):
 
 # TODO Scale RPeak Y Locations (so I can use seconds as X axis)
 def plot_derivated_and_peaks(derivated, avg, n ,t):
-    plt.plot(derivated[1:n], 'b-', linewidth=1, label='Derivated Signal')
-    plt.plot(avg[1:n], 'g-', label='Moving Average')
-    plt.scatter(results['R_peak_X_locations'], results['R_peak_Y_locations'], color='red', label="Average HR: %.2f BPM" % results['bpm'])
+    plt.plot(derivated[1:n], 'b-', linewidth=1, label='Derivated Signal', zorder=1)
+    plt.plot(avg[1:n], 'g-', label='Moving Average', zorder=2)
+    plt.scatter(results['R_peak_X_locations'], results['R_peak_Y_locations'], color='red', label="Average HR: %.2f BPM" % results['bpm'], zorder=3)
     plt.xlabel('Samples')
     plt.grid()
     plt.legend(loc='upper center', bbox_to_anchor=(0.9, 1.175), fancybox=True, framealpha=1, shadow=True)
