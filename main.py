@@ -9,7 +9,7 @@ import sys
 # MODE:
 # 1 -> Arduino
 # 2 -> RaspberryPI
-mode = 1
+mode = 2
 T = 30
 fs = 250
 fc_low = 5
