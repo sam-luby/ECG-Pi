@@ -1,8 +1,6 @@
 from __future__ import division
 import scipy.signal as signal
 import matplotlib.pyplot as plt
-from numpy.fft import fft
-import scipy
 from scipy.signal import butter, lfilter
 import numpy as np
 import pandas as pd

@@ -1,5 +1,3 @@
-import csv
-import numpy as np
 import serial
 import time
 import pandas as pd
