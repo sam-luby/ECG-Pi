@@ -15,17 +15,18 @@ T = 30
 fs = 250
 fc_low = 5
 fc_high = 15
-file_name = 'sample-data/mcpout.csv'
+file_name = 'sample-data/output.csv'
+Nsamp = T*fs
 
 ##############
 #    Main    #
 ##############
 if mode == 1:
-    Nsamp = ard.get_data_from_arduino(T)
+    #Nsamp = ard.get_data_from_arduino(T)
     pt.run_pan_thomp(file_name, fs, fc_high, fc_low, Nsamp)  # Run Pan Thompkins algorithm on collected ECG data
-    os.remove(file_name)                                     # Remove file after processing
+    #os.remove(file_name)                                     # Remove file after processing
 elif mode == 2:
-    Nsamp = mcp.get_data_from_MCP(T)
+    # Nsamp = mcp.get_data_from_MCP(T)
     pt.run_pan_thomp(file_name, fs, fc_high, fc_low, Nsamp)  # Run Pan Thompkins algorithm on collected ECG data
     #os.remove(file_name)
 else:
