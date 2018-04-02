@@ -2,7 +2,7 @@ import serial
 import time
 import pandas as pd
 
-def get_data_from_arduino(T):                        # arg (T) is how long to record for
+def get_data_from_arduino(T, filename):                        # arg (T) is how long to record for
     print("Recording ECG data for {} seconds.".format(T))
     FS = 250                                         # sampling rate [set by arduino, dont change]
     Nsamp = FS*T                                     # number of samples to obtain
@@ -26,5 +26,5 @@ def get_data_from_arduino(T):                        # arg (T) is how long to re
     # print(len(dat))
     print("Recording complete, processing ECG data...")
     dat = pd.DataFrame(dat)
-    dat.to_csv("sample-data/output.csv", index=False)
+    dat.to_csv(filename, index=False)
     return Nsamp
