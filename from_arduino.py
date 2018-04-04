@@ -12,7 +12,7 @@ def get_data_from_arduino(T, filename):                        # arg (T) is how 
     arduino = serial.Serial('COM4', 115200, timeout=1)  # USB Port, Baud Rate
     time.sleep(1)                                       # allow for connection to be established
     dat = []
-    i = 0
+    i = 1
     percentage = 10
 
     while True and i < Nsamp:                       #While there is data to record & less than specified number of samples
