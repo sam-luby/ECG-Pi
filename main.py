@@ -10,12 +10,12 @@ import sys
 # MODE:
 # 1 -> Arduino
 # 2 -> RaspberryPI
-mode = 1
-T = 300
+mode = 2
+T = 30
 fs = 250
 fc_low = 5
 fc_high = 35
-file_name = 'sample-data/new-output.csv'
+file_name = 'sample-data/mcpout.csv'
 Nsamp = T*fs
 
 ##############
@@ -26,7 +26,7 @@ if mode == 1:
     pt.run_pan_thomp(file_name, fs, fc_high, fc_low, Nsamp)  # Run Pan Thompkins algorithm on collected ECG data
     #os.remove(file_name)                                     # Remove file after processing
 elif mode == 2:
-    # Nsamp = mcp.get_data_from_MCP(T)
+    Nsamp = mcp.get_data_from_MCP(T)
     pt.run_pan_thomp(file_name, fs, fc_high, fc_low, Nsamp)  # Run Pan Thompkins algorithm on collected ECG data
     #os.remove(file_name)
 else:

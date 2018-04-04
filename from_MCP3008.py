@@ -17,7 +17,6 @@ def get_data_from_MCP(T):
     print('Reading MCP3008 values, press Ctrl-C to quit...')
     while True and i < Nsamp:
         value = mcp.read_adc(0)
-        print(value)
         values.append(value)
         i+=1
         time.sleep(0.004)
