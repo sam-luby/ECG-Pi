@@ -20,8 +20,12 @@ def get_data_from_MCP(T, filename):
 
     print('Reading MCP3008 values, press Ctrl-C to quit...')
     while True and i < Nsamp:
-        values.append(mcp.read_adc(0))
+        value = mcp.read_adc(0)
+        values.append(value)
         i+=1
+        if i in milestones:  # Silly %age completed indication for user
+            print("Collecting data, {}% complete.".format(percentage))
+            percentage += 10
         time.sleep(0.004)
     print(len(values))
     print("Recording complete, processing ECG data...")
@@ -29,4 +33,3 @@ def get_data_from_MCP(T, filename):
     dat.to_csv(filename, index=False)
     return Nsamp
         
-
