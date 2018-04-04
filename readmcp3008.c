@@ -4,7 +4,7 @@ rawMCP3008.c
 Public Domain
 2016-03-20
 
-gcc -Wall -pthread -o rawMCP3008 rawMCP3008.c -lpigpio
+gcc -Wall -pthread -o readmcp3008 readmcp3008.c -lpigpio
 
 This code shows how to bit bang SPI using DMA.
 
@@ -101,11 +101,15 @@ int main(int argc, char *argv[])
    float cbs_per_reading;
    rawWaveInfo_t rwi;
    double start, end;
-   int pause;
+   int pause = 0;
+   char *filename;
  
-
-   if (argc > 1) pause = atoi(argv[1]); else pause =0;
-
+   
+   if (argc > 1) filename = argv[1];
+   // if (argc > 1) pause = atoi(argv[1]); else pause =0;
+ 
+   printf(filename);
+   printf("\n");
    if (gpioInitialise() < 0) return 1;
 
    // Need to set GPIO as outputs otherwise wave will have no effect.
@@ -264,8 +268,6 @@ int main(int argc, char *argv[])
 
    printf("# %d samples in %.1f seconds (%.0f/s)\n",
       SAMPLES, end-start, (float)SAMPLES/(end-start));
-
-   printf("# %d should be the 7500th sample\n", ecgvalues[7500]);
     
    fprintf(stderr, "ending...\n");
 
@@ -275,8 +277,7 @@ int main(int argc, char *argv[])
 
 
    FILE *fp;
-   char output[] = "output.csv";
-   fp = fopen(output, "w");
+   fp = fopen(filename, "w");
    for(i=1; i<=SAMPLES; i++) {
       fprintf(fp, "%d\n", ecgvalues[i]);
    }
