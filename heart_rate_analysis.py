@@ -42,9 +42,10 @@ def _calculate_pNNx(results, x=50):
 
 
 def run_hrv_analysis(results):
-    _calculate_RMSSD(results)
-    _calculate_SDNN(results)
-    _calculate_pNNx(results)
+    results['rmssd'] =_calculate_RMSSD(results)
+    results['sdnn'] = _calculate_SDNN(results)
+    results['pNNx'] = _calculate_pNNx(results)
+    return results
 
 
 
