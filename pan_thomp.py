@@ -115,46 +115,6 @@ def calculate_bpm():
     results['bpm'] = 60000 / np.mean(RR_list)       # get average of RR intervals, convert from per ms to per min
 
 
-# calculate RMSSD
-def calculate_RMSSD():
-    RR_list = results['RR_list']
-    print(RR_list)
-    x = 0
-    for i in range(len(RR_list)-1):
-        x += (RR_list[i+1] - RR_list[i])**2
-    x = x * (1 / (len(RR_list) - 1))
-    rmssd = math.sqrt(x)
-    print(rmssd)
-    return rmssd
-
-
-# calculate SDNN
-def calculate_SDNN():
-    RR_list = results['RR_list']
-    avg = np.mean(RR_list)
-    x = 0
-    for i in range(len(RR_list)):
-        x += (RR_list[i] - avg)**2
-    x = x * (1 / (len(RR_list) - 1))
-    sdnn = math.sqrt(x)
-    print(sdnn)
-    return sdnn
-
-
-# get NNx and calculate pNNx
-def calculate_pNNx(x=50):
-    RR_list = results['RR_list']
-    count = 0
-    for i in range(len(RR_list)-1):
-        if (RR_list[i+1] - RR_list[i]) > 50:
-            count+=1
-    NNx = count
-    pNNx = NNx/len(RR_list)
-    print(pNNx)
-    return pNNx
-
-
-
 # plot input signal
 def plot_input(data, n, t):
     plt.plot(t[1:n], data[1:n])
@@ -198,7 +158,5 @@ def run_pan_thomp(file, fs, fc_high, fc_low, Nsamp):
     detect_R_peaks(data)
     calculate_RR_intervals(fs)
     calculate_bpm()
-    calculate_RMSSD()
-    calculate_SDNN()
-    calculate_pNNx()
     plot_derivated_and_peaks(data['derivated'], data['avg'], n, t)
+    return results
