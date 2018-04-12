@@ -15,7 +15,7 @@ import analyse_results
 # 1 -> Arduino
 # 2 -> RaspberryPI
 # 3 -> Debug mode [use pre-recorded data]
-mode = 3
+mode = 2
 T = 30
 fs = 250
 fc_low = 5
@@ -36,7 +36,7 @@ if mode == 1:
     # analyse_results.keep_or_delete_data(filename, results)
 elif mode == 2:
     filename = ("sample-data/" + "RPI_" + str(T) + "secs_" + file_suffix)
-    commandline = "sudo ./readmcp3008 " + filename
+    commandline = "sudo ./from_MCP3008 " + filename
     os.system(commandline)
     #Nsamp = mcp.get_data_from_MCP(T, filename)
     results = pt.run_pan_thomp(filename, fs, fc_high, fc_low, Nsamp)  # Run Pan Thompkins algorithm on collected ECG data
