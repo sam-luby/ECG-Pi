@@ -6,6 +6,7 @@ import from_MCP3008 as mcp
 import os
 import sys
 import datetime
+import analyse_results
 
 ##############
 #   Params   #
@@ -32,7 +33,7 @@ if mode == 1:
     results = pt.run_pan_thomp(filename, fs, fc_high, fc_low, Nsamp)      # Run Pan Thompkins algorithm on collected ECG data
     results = hrv.run_hrv_analysis(results)
     thingspeak.update_channel(results)
-    #os.remove(filename)                                     # Remove file after processing
+    # analyse_results.keep_or_delete_data(filename, results)
 elif mode == 2:
     filename = ("sample-data/" + "RPI_" + str(T) + "secs_" + file_suffix)
     commandline = "sudo ./readmcp3008 " + filename
@@ -40,12 +41,14 @@ elif mode == 2:
     #Nsamp = mcp.get_data_from_MCP(T, filename)
     results = pt.run_pan_thomp(filename, fs, fc_high, fc_low, Nsamp)  # Run Pan Thompkins algorithm on collected ECG data
     results = hrv.run_hrv_analysis(results)
-    #os.remove(filename)
+    # analyse_results.keep_or_delete_data(filename, results)
 elif mode == 3:
-    filename = "sample-data/140BPMoutput.csv"
+    filename = "sample-data/60BPMoutput.csv"
     results = pt.run_pan_thomp(filename, fs, fc_high, fc_low, Nsamp)  # Run Pan Thompkins algorithm on collected ECG data
     results = hrv.run_hrv_analysis(results)
     thingspeak.update_channel(results)
+    print(results)
+    # analyse_results.keep_or_delete_data(filename, results)
 else:
     print("Enter correct mode")
 
