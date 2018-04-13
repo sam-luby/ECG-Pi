@@ -15,7 +15,11 @@ import analyse_results
 # 1 -> Arduino
 # 2 -> RaspberryPI
 # 3 -> Debug mode [use pre-recorded data]
-mode = 2
+
+# TODO Change samples axis to time
+# TODO Change amplitude axis
+# TODO Nice updating graph
+mode = 3
 T = 30
 fs = 250
 fc_low = 5
