@@ -19,7 +19,7 @@ import analyse_results
 # TODO Change samples axis to time
 # TODO Change amplitude axis
 # TODO Nice updating graph
-mode = 3
+mode = 1
 T = 30
 fs = 250
 fc_low = 5
@@ -33,11 +33,12 @@ Nsamp = T*fs
 ##############
 if mode == 1:
     filename = ("sample-data/" + "Arduino_" + str(T) + "secs_" + file_suffix)
-    #Nsamp = ard.get_data_from_arduino(T, filename)
+    Nsamp = ard.get_data_from_arduino(T, filename)
     results = pt.run_pan_thomp(filename, fs, fc_high, fc_low, Nsamp)      # Run Pan Thompkins algorithm on collected ECG data
     results = hrv.run_hrv_analysis(results)
     thingspeak.update_channel(results)
     # analyse_results.keep_or_delete_data(filename, results)
+
 elif mode == 2:
     filename = ("sample-data/" + "RPI_" + str(T) + "secs_" + file_suffix)
     commandline = "sudo ./from_MCP3008 " + filename
@@ -45,7 +46,9 @@ elif mode == 2:
     #Nsamp = mcp.get_data_from_MCP(T, filename)
     results = pt.run_pan_thomp(filename, fs, fc_high, fc_low, Nsamp)  # Run Pan Thompkins algorithm on collected ECG data
     results = hrv.run_hrv_analysis(results)
+    thingspeak.update_channel(results)
     # analyse_results.keep_or_delete_data(filename, results)
+
 elif mode == 3:
     filename = "sample-data/60BPMoutput.csv"
     results = pt.run_pan_thomp(filename, fs, fc_high, fc_low, Nsamp)  # Run Pan Thompkins algorithm on collected ECG data
