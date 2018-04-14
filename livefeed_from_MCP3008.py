@@ -4,7 +4,7 @@ from matplotlib import animation
 
 
 arduino = serial.Serial('COM4', 115200)
-Nsamp = 750
+Nsamp = 1250
 fig = plt.figure(figsize=(10, 5))
 ax = plt.axes(xlim=(0,Nsamp), ylim=(280, 420))
 # ax.get_xaxis().set_visible(False)
@@ -37,4 +37,4 @@ def animate(i):
 
 anim = animation.FuncAnimation(fig, animate, init_func=init, interval=1, blit=True)
 
-plt.show()     
+plt.show()
