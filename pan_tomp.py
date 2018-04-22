@@ -1,8 +1,6 @@
 from __future__ import division
 import scipy.signal as signal
 import matplotlib.pyplot as plt
-import matplotlib.ticker as ticker
-import matplotlib.axes as axes
 from scipy.signal import butter, lfilter
 import numpy as np
 import pandas as pd
@@ -43,7 +41,7 @@ def filter_signal(noisy_signal, high, low, fs):
     B, A = butter(2, fc_high / nyq, btype='high')  # 2nd order BW HighPassFilter
     filtered_signal = lfilter(B, A, filtered_signal, axis=0)
     # some amplification
-    return filtered_signal*10
+    return filtered_signal
 
 
 # get time interval array used for plotting functions
@@ -55,10 +53,12 @@ def get_interval(fs, lines, data):
 
 
 #  derivate and square signal
-def derivate_signal(data, n):
+def derivate_signal(data, n, t):
     h = [-1., -2., 0., 2., 1.]
+    for i in range(len(h)):
+        h[i] = 1/8
     derivated_signal = signal.convolve(data, h)
-    derivated_signal = (derivated_signal ** 2)/1000
+    derivated_signal = (derivated_signal ** 2)
     deriv = derivated_signal[:n]
     return deriv
 
@@ -69,7 +69,7 @@ def moving_average(data, hrw, fs):
     mov_avg = pd.rolling_mean(data, window=int(hrw * fs))
     avg_heart_rate = np.mean(data)
     mov_avg = [avg_heart_rate if math.isnan(x) else x for x in mov_avg]
-    avg = [10 + x*3 for x in mov_avg]
+    avg = [10 + x for x in mov_avg]
     return avg
 
 
@@ -83,7 +83,7 @@ def detect_R_peaks(data):
 
     for ecg_val in deriv:
         avg = int(mov_avg[count])
-        if (int(ecg_val) <= avg) and (len(window) <= 1): # Here is the update in (ecg_val <= rollingmean)
+        if (int(ecg_val) <= avg) and (len(window) <= 1):
             count += 1
         elif int(ecg_val) > avg:
             window.append(ecg_val)
@@ -118,8 +118,12 @@ def calculate_bpm():
 
 
 # plot input signal
-def plot_input(data, n, t):
-    plt.plot(t[1:n], data[1:n])
+def plot_input(data, n, t, fs):
+    n = 1250
+    plt.plot(data[1:n])
+    ax = plt.gca()
+    ax.set_xticklabels(map(int, ax.get_xticks()/fs))
+    plt.xlabel('Time (seconds)')
     plt.show()
 
 
@@ -134,7 +138,6 @@ def plot_input_and_filtered(input, filtered, n ,t):
     plt.show()
 
 
-# TODO Scale RPeak Y Locations (so I can use seconds as X axis)
 # Plots derivated signal and rolling mean, also adds QRS peaks
 def plot_derivated_and_peaks(derivated, avg, n ,t):
     plt.plot(derivated[1:n], 'b-', linewidth=1, label='Derivated Signal', zorder=1)
@@ -148,25 +151,16 @@ def plot_derivated_and_peaks(derivated, avg, n ,t):
 
 # new method of printing output
 def plot_output(derivated, avg, n ,fs, t):
-    # n = int(n/fs)
-    plt.plot(derivated[1:n], 'b-', linewidth=1, label='Derivated Signal', zorder=1)
+    plt.plot(derivated[1:n], 'b-', linewidth=1, label='Output pulse stream', zorder=1)
     plt.plot(avg[1:n], 'g-', label='Moving Average', zorder=2)
-    # locs = results['R_peak_X_locations']
-    # newlocs = []
-    # for loc in locs:
-    #     newlocs.append(loc/fs)
-    # results['R_peak_X_locations'] = newlocs
-    plt.scatter(results['R_peak_X_locations'], results['R_peak_Y_locations'], color='red',
-                label="Average HR: %.2f BPM" % results['bpm'], zorder=3)
+    plt.scatter(results['R_peak_X_locations'], results['R_peak_Y_locations'], color='red', label="Average HR: %.2f BPM" % results['bpm'], zorder=3)
     plt.xlabel('Time (seconds)')
     plt.grid()
     plt.legend(loc='upper center', bbox_to_anchor=(0.9, 1.175), fancybox=True, framealpha=1, shadow=True)
-
     ax = plt.gca()
     ax.set_xticklabels(map(int, ax.get_xticks()/fs))
     ax.axes.get_yaxis().set_visible(False)
     plt.show()
-
 
 
 # does all the stuff
@@ -178,11 +172,12 @@ def run_pan_tomp(file, fs, fc_high, fc_low, Nsamp):
     data['filtered'] = filter_signal(data['noise'], fc_high, fc_low, fs)
     n, t = get_interval(fs, lines, data)
     # plot_input_and_filtered(data['ecgdat'], data['filtered'], n, t)
-    data['derivated'] = derivate_signal(data['filtered'], n)
+    data['derivated'] = derivate_signal(data['filtered'], n, t)
     data['avg'] = moving_average(data['derivated'], 0.125, fs)
     detect_R_peaks(data)
     calculate_RR_intervals(fs)
     calculate_bpm()
     # plot_derivated_and_peaks(data['derivated'], data['avg'], n, t)
+    # plot_input(data['ecgdat'], n, t, fs)
     plot_output(data['derivated'], data['avg'], n, fs, t)
     return results

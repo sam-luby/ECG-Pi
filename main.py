@@ -16,7 +16,6 @@ import analyse_results
 # 2 -> RaspberryPI
 # 3 -> Debug mode [use pre-recorded data]
 
-# TODO Change samples axis to time
 # TODO Change amplitude axis
 # TODO Nice updating graph
 mode = 3
