@@ -18,7 +18,7 @@ import analyse_results
 
 # TODO Change amplitude axis
 # TODO Nice updating graph
-mode = 3
+mode = 2
 T = 30
 fs = 250
 fc_low = 5
