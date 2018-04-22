@@ -145,7 +145,7 @@ def plot_derivated_and_peaks(derivated, avg, n ,t):
 
 
 # does all the stuff
-def run_pan_thomp(file, fs, fc_high, fc_low, Nsamp):
+def run_pan_tomp(file, fs, fc_high, fc_low, Nsamp):
     lines = open_data_file(file)
     data = data_scaling(lines)
     data = data[0:Nsamp].reset_index()

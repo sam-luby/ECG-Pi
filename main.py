@@ -1,5 +1,5 @@
-import pan_thomp as pt
-import heart_rate_analysis as hrv
+import pan_tomp as pt
+import heart_rate_variability_analysis as hrv
 import to_thingspeak as thingspeak
 import from_arduino as ard
 import from_MCP3008 as mcp
@@ -19,7 +19,7 @@ import analyse_results
 # TODO Change samples axis to time
 # TODO Change amplitude axis
 # TODO Nice updating graph
-mode = 1
+mode = 3
 T = 30
 fs = 250
 fc_low = 5
@@ -34,7 +34,7 @@ Nsamp = T*fs
 if mode == 1:
     filename = ("sample-data/" + "Arduino_" + str(T) + "secs_" + file_suffix)
     Nsamp = ard.get_data_from_arduino(T, filename)
-    results = pt.run_pan_thomp(filename, fs, fc_high, fc_low, Nsamp)      # Run Pan Thompkins algorithm on collected ECG data
+    results = pt.run_pan_tomp(filename, fs, fc_high, fc_low, Nsamp)      # Run Pan Thompkins algorithm on collected ECG data
     results = hrv.run_hrv_analysis(results)
     thingspeak.update_channel(results)
     # analyse_results.keep_or_delete_data(filename, results)
@@ -44,17 +44,18 @@ elif mode == 2:
     commandline = "sudo ./from_MCP3008 " + filename
     os.system(commandline)
     #Nsamp = mcp.get_data_from_MCP(T, filename)
-    results = pt.run_pan_thomp(filename, fs, fc_high, fc_low, Nsamp)  # Run Pan Thompkins algorithm on collected ECG data
+    results = pt.run_pan_tomp(filename, fs, fc_high, fc_low, Nsamp)  # Run Pan Thompkins algorithm on collected ECG data
     results = hrv.run_hrv_analysis(results)
     thingspeak.update_channel(results)
     # analyse_results.keep_or_delete_data(filename, results)
 
 elif mode == 3:
     filename = "sample-data/60BPMoutput.csv"
-    results = pt.run_pan_thomp(filename, fs, fc_high, fc_low, Nsamp)  # Run Pan Thompkins algorithm on collected ECG data
+    results = pt.run_pan_tomp(filename, fs, fc_high, fc_low, Nsamp)  # Run Pan Thompkins algorithm on collected ECG data
     results = hrv.run_hrv_analysis(results)
     thingspeak.update_channel(results)
     print(results)
+    print(type(results))
     # analyse_results.keep_or_delete_data(filename, results)
 else:
     print("Enter correct mode")
