@@ -1,6 +1,8 @@
 from __future__ import division
 import scipy.signal as signal
 import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
+import matplotlib.axes as axes
 from scipy.signal import butter, lfilter
 import numpy as np
 import pandas as pd
@@ -144,6 +146,29 @@ def plot_derivated_and_peaks(derivated, avg, n ,t):
     plt.show()
 
 
+# new method of printing output
+def plot_output(derivated, avg, n ,fs, t):
+    # n = int(n/fs)
+    plt.plot(derivated[1:n], 'b-', linewidth=1, label='Derivated Signal', zorder=1)
+    plt.plot(avg[1:n], 'g-', label='Moving Average', zorder=2)
+    # locs = results['R_peak_X_locations']
+    # newlocs = []
+    # for loc in locs:
+    #     newlocs.append(loc/fs)
+    # results['R_peak_X_locations'] = newlocs
+    plt.scatter(results['R_peak_X_locations'], results['R_peak_Y_locations'], color='red',
+                label="Average HR: %.2f BPM" % results['bpm'], zorder=3)
+    plt.xlabel('Time (seconds)')
+    plt.grid()
+    plt.legend(loc='upper center', bbox_to_anchor=(0.9, 1.175), fancybox=True, framealpha=1, shadow=True)
+
+    ax = plt.gca()
+    ax.set_xticklabels(map(int, ax.get_xticks()/fs))
+    ax.axes.get_yaxis().set_visible(False)
+    plt.show()
+
+
+
 # does all the stuff
 def run_pan_tomp(file, fs, fc_high, fc_low, Nsamp):
     lines = open_data_file(file)
@@ -152,11 +177,12 @@ def run_pan_tomp(file, fs, fc_high, fc_low, Nsamp):
     data['noise'] = data['ecgdat'] + np.random.normal(0, 0.75, len(data))
     data['filtered'] = filter_signal(data['noise'], fc_high, fc_low, fs)
     n, t = get_interval(fs, lines, data)
-    plot_input_and_filtered(data['ecgdat'], data['filtered'], n, t)
+    # plot_input_and_filtered(data['ecgdat'], data['filtered'], n, t)
     data['derivated'] = derivate_signal(data['filtered'], n)
     data['avg'] = moving_average(data['derivated'], 0.125, fs)
     detect_R_peaks(data)
     calculate_RR_intervals(fs)
     calculate_bpm()
-    plot_derivated_and_peaks(data['derivated'], data['avg'], n, t)
+    # plot_derivated_and_peaks(data['derivated'], data['avg'], n, t)
+    plot_output(data['derivated'], data['avg'], n, fs, t)
     return results
