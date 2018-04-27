@@ -24,7 +24,7 @@ def keep_or_delete_data(filename, results):
         alert_flag = True
 
 
-    # check delete flag
+    # check delete flag, delete original ECG data if required
     if not alert_flag:
         os.remove(filename)
         print("Results are normal, data removed")

@@ -1,8 +1,10 @@
+# heart rate variability (HRV) analysis of ECG data
+
 import numpy as np
 import math
 
 
-# calculate RMSSD
+# calculate RMSSD (root mean square of successive differences)
 def _calculate_RMSSD(results):
     RR_list = results['RR_list']
     print(RR_list)
@@ -15,7 +17,7 @@ def _calculate_RMSSD(results):
     return rmssd
 
 
-# calculate SDNN
+# calculate SDNN (standard deviation of RR intervals)
 def _calculate_SDNN(results):
     RR_list = results['RR_list']
     avg = np.mean(RR_list)
@@ -28,19 +30,18 @@ def _calculate_SDNN(results):
     return sdnn
 
 
-# get NNx and calculate pNNx
+# get NNx and calculate pNNx (proportion of successive NN intervals that differ by > 50m)s
 def _calculate_pNNx(results, x=50):
     RR_list = results['RR_list']
-    count = 0
+    NNx = 0
     for i in range(len(RR_list)-1):
         if (RR_list[i+1] - RR_list[i]) > x:
-            count+=1
-    NNx = count
+            NNx+=1
     pNNx = NNx/len(RR_list)
     print(pNNx)
     return pNNx
 
-
+# main function
 def run_hrv_analysis(results):
     results['rmssd'] =_calculate_RMSSD(results)
     results['sdnn'] = _calculate_SDNN(results)

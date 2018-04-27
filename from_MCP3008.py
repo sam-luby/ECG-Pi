@@ -5,6 +5,7 @@ import pandas as pd
 
 #run pip3 install Adafruit-GPIO & pip3 install Adafruit-MCP3008 if packages not found
 
+# retrieve data from ADC using SPI interface
 def get_data_from_MCP(T, filename):
     fs = 250
     i = 0
@@ -23,10 +24,10 @@ def get_data_from_MCP(T, filename):
         value = mcp.read_adc(0)
         values.append(value)
         i+=1
-        if i in milestones:  # Silly %age completed indication for user
+        if i in milestones:  # percentage completed indication for user
             print("Collecting data, {}% complete.".format(percentage))
             percentage += 10
-        time.sleep(0.004)
+        time.sleep(0.004)   # not the best
     print(len(values))
     print("Recording complete, processing ECG data...")
     dat = pd.DataFrame(values)

@@ -2,6 +2,8 @@ import serial
 import time
 import pandas as pd
 
+
+# gather data from Arduino using serial port
 def get_data_from_arduino(T, fs, filename):                        # arg (T) is how long to record for
     print("Recording ECG data for {} seconds.".format(T))
     FS = fs                                         # sampling rate [set by arduino, dont change]
@@ -26,5 +28,7 @@ def get_data_from_arduino(T, fs, filename):                        # arg (T) is 
     # print(len(dat))
     print("Recording complete, processing ECG data...")
     dat = pd.DataFrame(dat)
+
+    # store data in csv
     dat.to_csv(filename, index=False)
     return Nsamp

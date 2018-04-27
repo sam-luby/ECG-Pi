@@ -1,3 +1,4 @@
+# program to read ECG from serial port and display an updating graph
 import serial
 from matplotlib import pyplot as plt
 from matplotlib import animation
@@ -22,14 +23,14 @@ dat = []
 for i in range(0, Nsamp):
     dat.append(0)
 
+
 def init():
     graph.set_data([], [])
     return graph,
 
+# continuously update pyplot
 def animate(i):
     global t, dat
-    # while arduino.in_waiting() == 0:
-    #     pass
     dat.append(float(arduino.readline().decode("utf-8")))
     dat.pop(0)
     graph.set_data(t, dat)

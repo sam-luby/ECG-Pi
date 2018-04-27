@@ -1,3 +1,4 @@
+# read ECG data using arduino and show live-view of data.
 import serial
 from matplotlib import pyplot as plt
 from matplotlib import animation

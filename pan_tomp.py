@@ -69,7 +69,7 @@ def moving_average(data, hrw, fs):
     mov_avg = pd.rolling_mean(data, window=int(hrw * fs))
     avg_heart_rate = np.mean(data)
     mov_avg = [avg_heart_rate if math.isnan(x) else x for x in mov_avg]
-    avg = [200 + 2*x for x in mov_avg]
+    avg = [200 + 2*x for x in mov_avg]   # scaling. hacky way of implementing thresholding
     return avg
 
 
@@ -81,6 +81,7 @@ def detect_R_peaks(data):
     mov_avg = data['avg'].tolist()
     deriv = data['derivated'].tolist()
 
+    # go through each value in deriv signal, check amplitude compared to average
     for ecg_val in deriv:
         avg = int(mov_avg[count])
         if (int(ecg_val) <= avg) and (len(window) <= 1):
@@ -89,8 +90,8 @@ def detect_R_peaks(data):
             window.append(ecg_val)
             count += 1
         else:
-            beatposition = count - len(window) + (window.index(max(window)))
-            R_peak_locations.append(beatposition)
+            R_position = count - len(window) + (window.index(max(window)))
+            R_peak_locations.append(R_position)
             window = []
             count += 1
     results['R_peak_X_locations'] = R_peak_locations
@@ -163,7 +164,7 @@ def plot_output(derivated, avg, n ,fs, t):
     plt.show()
 
 
-# does all the stuff
+# main function in file, calls all subfunctions
 def run_pan_tomp(file, fs, fc_high, fc_low, Nsamp):
     lines = open_data_file(file)
     data = data_scaling(lines)
@@ -171,13 +172,13 @@ def run_pan_tomp(file, fs, fc_high, fc_low, Nsamp):
     data['noise'] = data['ecgdat'] + np.random.normal(0, 0.75, len(data))
     data['filtered'] = filter_signal(data['noise'], fc_high, fc_low, fs)
     n, t = get_interval(fs, lines, data)
-    # plot_input_and_filtered(data['ecgdat'], data['filtered'], n, t)
+    plot_input_and_filtered(data['ecgdat'], data['filtered'], n, t)
     data['derivated'] = derivate_signal(data['filtered'], n, t)
     data['avg'] = moving_average(data['derivated'], 0.125, fs)
     detect_R_peaks(data)
     calculate_RR_intervals(fs)
     calculate_bpm()
     # plot_derivated_and_peaks(data['derivated'], data['avg'], n, t)
-    plot_input(data['ecgdat'], n, t, fs)
+    # plot_input(data['ecgdat'], n, t, fs)
     plot_output(data['derivated'], data['avg'], n, fs, t)
     return results

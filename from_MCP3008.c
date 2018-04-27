@@ -1,4 +1,6 @@
 /*
+pigpio example modified by Sam Luby
+
 
 rawMCP3008.c
 Public Domain
