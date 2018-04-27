@@ -1,9 +1,10 @@
 import urllib.request
 
-API_KEY_WRITE = 'QVN6DOKQAI2WK4MR'
 API_KEY_READ = '9VSOE6M365ZBTHTU'
-channels = {'field1': 'bpm', 'field2': 'rmssd', 'field3': 'sdnn', 'field4' : 'pNNx'}
-baseurl = 'http://api.thingspeak.com/update?api_key=' + API_KEY_WRITE\
+
+API_KEY_WRITE = 'QVN6DOKQAI2WK4MR'
+channels = {'field1': 'bpm', 'field2': 'rmssd', 'field3': 'sdnn', 'field4': 'pNNx'}
+baseurl = 'http://api.thingspeak.com/update?api_key=' + API_KEY_WRITE
 
 def update_channel(results):
     data_to_update = ''

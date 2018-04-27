@@ -69,7 +69,7 @@ def moving_average(data, hrw, fs):
     mov_avg = pd.rolling_mean(data, window=int(hrw * fs))
     avg_heart_rate = np.mean(data)
     mov_avg = [avg_heart_rate if math.isnan(x) else x for x in mov_avg]
-    avg = [10 + x for x in mov_avg]
+    avg = [200 + 2*x for x in mov_avg]
     return avg
 
 
@@ -122,7 +122,7 @@ def plot_input(data, n, t, fs):
     n = 1250
     plt.plot(data[1:n])
     ax = plt.gca()
-    ax.set_xticklabels(map(int, ax.get_xticks()/fs))
+    ax.set_xticklabels(map(float, ax.get_xticks()/fs))
     plt.xlabel('Time (seconds)')
     plt.show()
 
@@ -178,6 +178,6 @@ def run_pan_tomp(file, fs, fc_high, fc_low, Nsamp):
     calculate_RR_intervals(fs)
     calculate_bpm()
     # plot_derivated_and_peaks(data['derivated'], data['avg'], n, t)
-    # plot_input(data['ecgdat'], n, t, fs)
+    plot_input(data['ecgdat'], n, t, fs)
     plot_output(data['derivated'], data['avg'], n, fs, t)
     return results

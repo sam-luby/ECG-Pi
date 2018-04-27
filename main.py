@@ -18,24 +18,24 @@ import analyse_results
 
 # TODO Change amplitude axis
 # TODO Nice updating graph
-mode = 2
+mode = 3
 T = 30
 fs = 250
-fc_low = 5
-fc_high = 35
+fc_low = 0.025*fs
+fc_high = 0.075*fs
 now = datetime.datetime.now()
 file_suffix= now.strftime("%d-%m-%Y_%Hh%Mm.csv")
-Nsamp = T*fs
+Nsamp = int(T*fs)
 
 ##############
 #    Main    #
 ##############
 if mode == 1:
     filename = ("sample-data/" + "Arduino_" + str(T) + "secs_" + file_suffix)
-    Nsamp = ard.get_data_from_arduino(T, filename)
+    Nsamp = ard.get_data_from_arduino(T, fs,filename)
     results = pt.run_pan_tomp(filename, fs, fc_high, fc_low, Nsamp)      # Run Pan Thompkins algorithm on collected ECG data
     results = hrv.run_hrv_analysis(results)
-    thingspeak.update_channel(results)
+    # thingspeak.update_channel(results)
     # analyse_results.keep_or_delete_data(filename, results)
 
 elif mode == 2:
@@ -51,11 +51,11 @@ elif mode == 2:
 elif mode == 3:
     filename = "sample-data/60BPMoutput.csv"
     results = pt.run_pan_tomp(filename, fs, fc_high, fc_low, Nsamp)  # Run Pan Thompkins algorithm on collected ECG data
-    results = hrv.run_hrv_analysis(results)
-    thingspeak.update_channel(results)
+    # results = hrv.run_hrv_analysis(results)
+    # thingspeak.update_channel(results)
     print(results)
+    print(type(results))
     print(type(results))
     # analyse_results.keep_or_delete_data(filename, results)
 else:
     print("Enter correct mode")
-

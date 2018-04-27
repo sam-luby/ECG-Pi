@@ -5,6 +5,8 @@ import matplotlib.animation as animation
 
 
 
+
+
 fig, ax = plt.subplots()
 
 x = np.arange(0, 2*np.pi, 0.01)
