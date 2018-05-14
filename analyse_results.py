@@ -1,5 +1,5 @@
 import os
-
+import time
 # results are for a male 18-25 (me)
 normal_results = {'BPM_HIGH': 120, 'BPM_LOW' : 40,
                   'RMSSD_HIGH': 100, 'RMSSD_LOW': 70,
@@ -15,19 +15,19 @@ def keep_or_delete_data(filename, results):
     if results['bpm'] > normal_results['BPM_HIGH'] or results['bpm'] < normal_results['BPM_LOW']:
         alert_flag = True
 
-    # check rmssd falls within normal range
-    if results['rmssd'] > normal_results['RMSSD_HIGH'] or results['rmssd'] < normal_results['RMSSD_LOW']:
-        alert_flag = True
+    # # check rmssd falls within normal range
+    # if results['rmssd'] > normal_results['RMSSD_HIGH'] or results['rmssd'] < normal_results['RMSSD_LOW']:
+    #     alert_flag = True
+    #
+    # # check sdnn falls withing normal range
+    # if  results['sdnn'] > normal_results['SDNN_HIGH'] or results['sdnn'] < normal_results['SDNN_LOW']:
+    #     alert_flag = True
 
-    # check sdnn falls withing normal range
-    if  results['sdnn'] > normal_results['SDNN_HIGH'] or results['sdnn'] < normal_results['SDNN_LOW']:
-        alert_flag = True
-
-
+    time.sleep(2)
     # check delete flag
     if not alert_flag:
-        os.remove(filename)
-        print("Results are normal, data removed")
+        # os.remove(filename)
+        print("Results are normal, data removed.")
     else:
         print("Abnormal results, additional analysis required.")
 

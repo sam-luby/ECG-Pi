@@ -32,7 +32,6 @@ def data_scaling(dataset):
 
 # bandpass filter the input signal
 def filter_signal(noisy_signal, high, low, fs):
-    fs = 250
     nyq = 0.5 * fs
     fc_high = high
     fc_low = low
@@ -55,10 +54,10 @@ def get_interval(fs, lines, data):
 #  derivate and square signal
 def derivate_signal(data, n, t):
     h = [-1., -2., 0., 2., 1.]
-    for i in range(len(h)):
-        h[i] = 1/8
+    # for i in range(len(h)):
+    #     h[i] = 1/8
     derivated_signal = signal.convolve(data, h)
-    derivated_signal = (derivated_signal ** 2)
+    derivated_signal = derivated_signal ** 2
     deriv = derivated_signal[:n]
     return deriv
 
@@ -69,7 +68,7 @@ def moving_average(data, hrw, fs):
     mov_avg = pd.rolling_mean(data, window=int(hrw * fs))
     avg_heart_rate = np.mean(data)
     mov_avg = [avg_heart_rate if math.isnan(x) else x for x in mov_avg]
-    avg = [10 + x for x in mov_avg]
+    avg = [2500 + 3*x for x in mov_avg]
     return avg
 
 
@@ -81,11 +80,12 @@ def detect_R_peaks(data):
     mov_avg = data['avg'].tolist()
     deriv = data['derivated'].tolist()
 
+    # check if derivated amplitude is > avg amplitude
     for ecg_val in deriv:
         avg = int(mov_avg[count])
         if (int(ecg_val) <= avg) and (len(window) <= 1):
             count += 1
-        elif int(ecg_val) > avg:
+        elif int(ecg_val) > avg :
             window.append(ecg_val)
             count += 1
         else:
@@ -93,8 +93,10 @@ def detect_R_peaks(data):
             R_peak_locations.append(beatposition)
             window = []
             count += 1
+            # print(ecg_val)
     results['R_peak_X_locations'] = R_peak_locations
     results['R_peak_Y_locations'] = [deriv[x] for x in R_peak_locations]
+
 
 
 # calculate the RR intervals (in milliseconds) [duration between successive R peaks]
@@ -102,13 +104,17 @@ def calculate_RR_intervals(fs):
     RR_list = []
     R_peak_locations = results['R_peak_X_locations']
     count = 0
+    RR_intervals = {}
     # calculate interval between successive RR peaks
     while count < (len(R_peak_locations) - 1):
         RR_interval = (R_peak_locations[count + 1] - R_peak_locations[count])
         interval_ms = ((RR_interval / fs) * 1000.0)     #interval is in milliseconds
         RR_list.append(interval_ms)                     #add result to RR intervals list
         count += 1
+        s = 'RR' + str(count)
+        RR_intervals.update({s : round(interval_ms, 2)})
     results['RR_list'] = RR_list                    #add list to results dictionary
+    return RR_intervals
 
 
 # calculate heart rate (beats per min)
@@ -119,10 +125,11 @@ def calculate_bpm():
 
 # plot input signal
 def plot_input(data, n, t, fs):
-    n = 1250
+    n = 650
     plt.plot(data[1:n])
     ax = plt.gca()
-    ax.set_xticklabels(map(int, ax.get_xticks()/fs))
+    ax.set_xticklabels(map(float, ax.get_xticks()/fs))
+    plt.ylabel('Amplitude')
     plt.xlabel('Time (seconds)')
     plt.show()
 
@@ -155,12 +162,95 @@ def plot_output(derivated, avg, n ,fs, t):
     plt.plot(avg[1:n], 'g-', label='Moving Average', zorder=2)
     plt.scatter(results['R_peak_X_locations'], results['R_peak_Y_locations'], color='red', label="Average HR: %.2f BPM" % results['bpm'], zorder=3)
     plt.xlabel('Time (seconds)')
+    plt.ylabel('Amplitude')
     plt.grid()
     plt.legend(loc='upper center', bbox_to_anchor=(0.9, 1.175), fancybox=True, framealpha=1, shadow=True)
     ax = plt.gca()
     ax.set_xticklabels(map(int, ax.get_xticks()/fs))
     ax.axes.get_yaxis().set_visible(False)
     plt.show()
+
+
+def each_stage_plot(data, fs, results):
+    data = data[0:800]
+    # input = data['ecgdat']
+    # plt.plot(input)
+    # plt.title('Input ECG Signal')
+    # plt.xlabel('Time (seconds)')
+    # plt.ylabel('Amplitude')
+    # ax = plt.gca()
+    # ax.set_xticklabels(map(float, ax.get_xticks()/fs))
+    # ax.set_yticklabels([])
+    # # ax.set_xticks(np.arange(0, 4, step=1))
+    # # ax.axes.get_yaxis().set_visible(False)
+    # plt.show()
+
+    # filtered = data['filtered']
+    # plt.plot(filtered)
+    # plt.title('Filtered Signal')
+    # plt.xlabel('Time (seconds)')
+    # plt.ylabel('Amplitude')
+    # ax = plt.gca()
+    # ax.set_xticklabels(map(float, ax.get_xticks() / fs))
+    # ax.set_yticklabels([])
+    # # ax.axes.get_yaxis().set_visible(False)
+    # plt.show()
+    #
+    derivated = data['derivated']
+    # plt.plot(derivated)
+    # plt.title('Differentiated Signal')
+    # plt.xlabel('Time (seconds)')
+    # plt.ylabel('Amplitude')
+    # ax = plt.gca()
+    # ax.set_xticklabels(map(float, ax.get_xticks() / fs))
+    # ax.set_yticklabels([])
+    # # ax.axes.get_yaxis().set_visible(False)
+    # plt.show()
+    #
+    # squared = data['squared']
+    # plt.title('Squared Signal')
+    # plt.plot(squared)
+    # plt.xlabel('Time (seconds)')
+    # plt.ylabel('Amplitude')
+    # ax = plt.gca()
+    # ax.set_xticklabels(map(float, ax.get_xticks() / fs))
+    # ax.set_yticklabels([])
+    # # ax.axes.get_yaxis().set_visible(False)
+    # plt.show()
+
+    # avg = data['avg']
+    # plt.title('Moving Average')
+    # plt.plot(avg)
+    # # plt.plot(squared)
+    # plt.xlabel('Time (seconds)')
+    # plt.ylabel('Amplitude')
+    # ax = plt.gca()
+    # ax.set_xticklabels(map(float, ax.get_xticks() / fs))
+    # ax.set_yticklabels([])
+    # # ax.axes.get_yaxis().set_visible(False)
+    # plt.show()
+
+    # plt.title('Moving Average Window over Differentiated Signal')
+    # plt.plot(avg, 'r')
+    # plt.plot(derivated)
+    # plt.xlabel('Time (seconds)')
+    # plt.ylabel('Amplitude')
+    # ax = plt.gca()
+    # ax.set_xticklabels(map(float, ax.get_xticks() / fs))
+    # ax.set_yticklabels([])
+    # ax.axes.get_yaxis().set_visible(False)
+    # plt.show()
+
+    # plt.title('Detected QRS Complexes')
+    # plt.plot(derivated)
+    # plt.scatter(results['R_peak_X_locations'][0:4], results['R_peak_Y_locations'][0:4], color='red', label="Average HR: %.2f BPM" % results['bpm'], zorder=3)
+    # plt.xlabel('Time (seconds)')
+    # plt.ylabel('Amplitude')
+    # ax = plt.gca()
+    # ax.set_xticklabels(map(float, ax.get_xticks() / fs))
+    # ax.set_yticklabels([])
+    # # ax.axes.get_yaxis().set_visible(False)
+    # plt.show()
 
 
 # does all the stuff
@@ -173,11 +263,18 @@ def run_pan_tomp(file, fs, fc_high, fc_low, Nsamp):
     n, t = get_interval(fs, lines, data)
     # plot_input_and_filtered(data['ecgdat'], data['filtered'], n, t)
     data['derivated'] = derivate_signal(data['filtered'], n, t)
-    data['avg'] = moving_average(data['derivated'], 0.125, fs)
+    # data['squared'] = square_signal(data['derivated'], n)
+    data['avg'] = moving_average(data['derivated'], 0.15, fs)
     detect_R_peaks(data)
-    calculate_RR_intervals(fs)
+    intervals = calculate_RR_intervals(fs)
     calculate_bpm()
     # plot_derivated_and_peaks(data['derivated'], data['avg'], n, t)
-    # plot_input(data['ecgdat'], n, t, fs)
+    # plot_input(data['ecgdat'], 250, t, fs)
     plot_output(data['derivated'], data['avg'], n, fs, t)
+    # each_stage_plot(data, fs, results)
+    # print(intervals)
+    for key, val in intervals.items():
+        print('{}: {} ms'.format(key, val))
+
     return results
+

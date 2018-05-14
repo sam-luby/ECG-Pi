@@ -5,13 +5,13 @@ import math
 # calculate RMSSD
 def _calculate_RMSSD(results):
     RR_list = results['RR_list']
-    print(RR_list)
+    # print(RR_list)
     x = 0
     for i in range(len(RR_list)-1):
         x += (RR_list[i+1] - RR_list[i])**2
     x = x * (1 / (len(RR_list) - 1))
     rmssd = math.sqrt(x)
-    print(rmssd)
+    # print(rmssd)
     return rmssd
 
 
@@ -24,7 +24,7 @@ def _calculate_SDNN(results):
         x += (RR_list[i] - avg)**2
     x = x * (1 / (len(RR_list) - 1))
     sdnn = math.sqrt(x)
-    print(sdnn)
+    # print(sdnn)
     return sdnn
 
 
@@ -36,8 +36,9 @@ def _calculate_pNNx(results, x=50):
         if (RR_list[i+1] - RR_list[i]) > x:
             count+=1
     NNx = count
-    pNNx = NNx/len(RR_list)
-    print(pNNx)
+    if NNx > 0: pNNx = NNx/len(RR_list)
+    else: pNNx = 0
+    # print(pNNx)
     return pNNx
 
 

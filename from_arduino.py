@@ -2,9 +2,9 @@ import serial
 import time
 import pandas as pd
 
-def get_data_from_arduino(T, filename):                        # arg (T) is how long to record for
+def get_data_from_arduino(T, fs, filename):                        # arg (T) is how long to record for
     print("Recording ECG data for {} seconds.".format(T))
-    FS = 250                                         # sampling rate [set by arduino, dont change]
+    FS = fs                                         # sampling rate [set by arduino, dont change]
     Nsamp = FS*T                                     # number of samples to obtain
     milestones = []
     for x in range(1,11):                            # List to store Nsamp/multiples of 10 for %age calc
