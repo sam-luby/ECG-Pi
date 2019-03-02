@@ -1,3 +1,6 @@
+Adafruit-GPIO==1.0.3
+Adafruit-MCP3008==1.0.2
+Adafruit-PureIO==0.2.3
 cycler==0.10.0
 future==0.17.1
 iso8601==0.1.12

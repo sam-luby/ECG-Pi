@@ -67,7 +67,7 @@ def derivate_signal(data, n, t):
 def moving_average(data, hrw, fs):
     # mov_avg = pd.Series(data.rolling(window=int(hrw * fs)).mean()) # pandas new rolling mean method, but slower than deprecated method
     #mov_avg = pd.rolling_mean(data, window=int(hrw * fs))
-	mov_avg = data.rolling(int(hrw * fs)).mean()
+    mov_avg = data.rolling(int(hrw * fs)).mean()
     avg_heart_rate = np.mean(data)
     mov_avg = [avg_heart_rate if math.isnan(x) else x for x in mov_avg]
     avg = [200 + 2*x for x in mov_avg]   # scaling. hacky way of implementing thresholding
