@@ -2,8 +2,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-signal_length = 1000
-file = 'ecg.txt'
+signal_length = 1500
+file = '../sample-data/ecg.txt'
 
 with open(file) as file_object:
     lines = file_object.readlines()
@@ -11,8 +11,8 @@ with open(file) as file_object:
 for i, line in enumerate(lines):
     lines[i] = float(line.strip())
     line = float(line.strip())
-    print(line)
-    print(type(line))
+    # print(line)
+    # print(type(line))
 
 
 lines = lines[0:signal_length]

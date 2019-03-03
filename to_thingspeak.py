@@ -1,8 +1,8 @@
 import urllib.request
 
 # API keys for reading and writing
-API_KEY_READ = '9VSOE6M365ZBTHTU'
-API_KEY_WRITE = 'QVN6DOKQAI2WK4MR'
+API_KEY_READ = 'LZIJ17H3NMAT172L'
+API_KEY_WRITE = 'UKOEUS8UIZOU0XAJ'
 
 # fields to upload
 channels = {'field1': 'bpm', 'field2': 'rmssd', 'field3': 'sdnn', 'field4': 'pNNx'}

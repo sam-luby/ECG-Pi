@@ -58,8 +58,8 @@ elif mode == 3: #debug
     filename = "sample-data/60BPMoutput.csv"
     results = pt.run_pan_tomp(filename, fs, fc_high, fc_low, Nsamp)  # Run Pan Thompkins algorithm on collected ECG data
     results = hrv.run_hrv_analysis(results)
-    # thingspeak.update_channel(results)
+    thingspeak.update_channel(results)
     print(results)
-    # analyse_results.keep_or_delete_data(filename, results)
+    analyse_results.keep_or_delete_data(filename, results)
 else:
     print("Enter correct mode")

@@ -7,10 +7,8 @@ import pandas as pd
 import math
 import warnings
 
-# ignore pandas warning about deprecated function
-warnings.simplefilter(action='ignore', category=FutureWarning)
-results = {}
 
+results = {}
 
 # open file and return data
 def open_data_file(file):
@@ -40,7 +38,6 @@ def filter_signal(noisy_signal, high, low, fs):
     filtered_signal = lfilter(B, A, noisy_signal, axis=0)
     B, A = butter(2, fc_high / nyq, btype='high')  # 2nd order BW HighPassFilter
     filtered_signal = lfilter(B, A, filtered_signal, axis=0)
-    # some amplification
     return filtered_signal
 
 
@@ -65,9 +62,7 @@ def derivate_signal(data, n, t):
 
 # rolling mean/moving average
 def moving_average(data, hrw, fs):
-    # mov_avg = pd.Series(data.rolling(window=int(hrw * fs)).mean()) # pandas new rolling mean method, but slower than deprecated method
-    #mov_avg = pd.rolling_mean(data, window=int(hrw * fs))
-    mov_avg = data.rolling(int(hrw * fs)).mean()
+    mov_avg = pd.Series(data.rolling(window=int(hrw * fs)).mean()) # pandas new rolling mean method, but slower than deprecated method
     avg_heart_rate = np.mean(data)
     mov_avg = [avg_heart_rate if math.isnan(x) else x for x in mov_avg]
     avg = [200 + 2*x for x in mov_avg]   # scaling. hacky way of implementing thresholding
