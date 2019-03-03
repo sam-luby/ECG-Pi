@@ -42,7 +42,7 @@ elif mode == 2: #RPI
     filename = ("sample-data/" + "RPI_" + str(T) + "secs_" + file_suffix)
 
     # this is how the C executable is called
-    commandline = "sudo ./from_MCP3008 " + filename
+    commandline = "sudo ./pi-gpio/from_MCP3008 " + filename
     os.system(commandline)
 
     # this is the old method used (in Python) for reading from ADC
