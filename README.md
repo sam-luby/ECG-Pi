@@ -36,7 +36,7 @@ A typical ECG signal is represented in the form of a _PQRST_ waveform, where eac
 * The QRS complex is a result of the depolarisation of the left and right ventricles. The increased amplitude of the QRS complex is due to the ventricles’ larger muscle mass compared to the atria, therefore producing larger biopotentials.
 * The T wave represents the repolarization of the ventricles.
 
-<pqrst wave pic>
+![picture alt](images/pqrst.png)
   
 
 The image above shows the general shape of an ECG signal, but is unrealistic due to the absense of noise. In reality, noise exists due to the patient's movement/respiration, power line interference and muscle noise from muscles contracting in close proximity to the heart.
@@ -49,7 +49,7 @@ Heart rate and heart rate variability are very different metrics. Heart rate (pu
 Heart rate variability is an analysis of the beat-to-beat variation. The interval between beats - known as the _RR_
 interval or inter-beat interval (IBI) - is measured in milliseconds and these intervals can be analysed to give a good overall indication of a person’s heart health.
 
-<pic of RR interval> 
+![picture alt](images/rr-int.png)
 
 
 The autonomic nervous system contains parasympathetic and sympathetic nerves which affect a human’s heart rate. Without the autonomic regulation, a resting heart rate would be around 100 BPM, known as the intrinsic heart rate. However, the _parasympathetic nervous system_ (PSNS) lowers the resting heart rate to around 70BPM. During intensive exercise, the _sympathetic nervous system_ (SNS) increases the rate rate.
@@ -106,19 +106,18 @@ A third-party ECG sensor was used for this project. The low-cost sensor uses a 3
 
 The image above shows the placement of electrodes for the 3-lead sensor. The three limb electrodes - denoted I, II and III - form an Einthoven’s triangle at the right arm (RA), left arm (LA) and left leg (LL). The ECG signal we then see is a combination of these seperate potentials. 
 1. Lead I: between the right and left shoulders.
-  i. _I = LA − RA_
+i. _I = LA − RA_
 2. Lead II: between the right arm and left leg.
-  ii. _II = LL − RA_
+ii. _II = LL − RA_
 3. Lead III: between the left shoulder to the left leg.
-  iii. _III = LL − LA_
+iii. _III = LL − LA_
   
  
 ### Software
 The majority of the software is written in Python. The main reason for this is that there are a huge amount of modules for interfacing with various modules like the ADC, as well as modules for signal processing and data analysis.
 
+![picture alt](images/program-flow.png)
 
-<program structure>
-  
 The above image shows the basic program flow. Executing the main file allows the user to choose the sampling rate, the lenght of time to record for, and the mode in which the program will run.
 1. Raspberry Pi mode (recording live data and analysing/storing data on the Pi).
 2. Arduino mode (recording live data using the Arduino, analysing/storing data on a PC or Pi).
@@ -133,8 +132,10 @@ The data read from the file is scaled to the range 0 to 1023 before any processi
 The Pan Tompkins algorithm is then used on the ECG data for feature classification. The derivative-based PT algorithm is a   series of singal processing steps to detect QRS peaks in the signal. The algorithm recognises QRS complexes based on analysis of the slope, amplitude and width.
 Pan Tompkins algorithm was chosen as it very accurate, computationally efficient and well-documented. The algorithm was implemented in Python for this project. PT algorithm starts by filtering out unwanted noise before amplifying the QRS complex. Finally, a decision algorithm is used to denote where a peak is located in the signal. 
 
-<pan tomp flow picture>
- 
+
+![picture alt](images/PT-Flow.png)
+
+
 The Pan Tompkins algorithm follows the processing steps shown above. 
 1. A band-pass filter, in the form of a low-pass cascaded with a high-pass, is used to filter the noisy input data.
 2. The signal is then differentiated to identify the large slopes associated with the _QRS_ complexes of a normal ECG signal. This process suppresses the low-frequency components of the ECG signal, while amplifying the high-frequency components. The result is an ECG signal with attenuated _P_ and _T_ waves, with amplified _QRS_ complexes.
@@ -161,7 +162,16 @@ Heart rate variability (HRV) analysis is a collection of various metrics used by
 #### Analysing Results
 Once the heart rate variation analysis has been performed, the results are examined. The purpose of this is to uncover any arrhythmias or abnormalities in the data. The results are compared with a list of 'normal' values - a range for each metric for which the average healthy person's data should fall between. The ranges I used are for a 20-29 year-old male (me).
 
-<pic of metrics ranges>
+
+HRV Metric | Normal Range
+------------ | ------------
+SDNN(ms) | 100-250
+SDANN(ms) | 80-240
+RMSSD(ms) | 20-90
+pNN50(%) | 5-25
+Heart Rate(bpm) | 60-100
+
+
   
 Each metric calculated is tested against the given range, and if there are no abnormalities found, then the data is removed automatically. If the results are found to be abnormal, the original data is stored locally and an indication as to the diagnosis or condition is reported to the user.
 
@@ -189,26 +199,35 @@ During development, the results obtained using the Raspberry Pi and ADC were inc
 
 The image below shows a segment of an input ECG signal recorded by the Pi, after normalisation.
 
-<pic of input ECG signal after normalisation>
+
+![picture alt](images/normalised-signal.png)
+
 
 
 A number of sampling rates were tested and analysed to determine if they were suitable. The concern here was the trade-off between accuracy and processing time, as well as the file-size for obtained data. Ideally, a very high sampling rate would be used as it would yield the most accurate ECG signal, with a large number of samples to represent the continuous-time ECG signal as a discrete-time signal. 
 
-< pics of different sampling rates > 
+![picture alt](images/sample-rates.png)
 
 As seen in the above figure, there is little difference between sampling at 250Hz and 500Hz on the ECG signal. Sampling at 50Hz however provided inconsistent results due to the undefined peak amplitude, as can be seen in the image below. I found that a sampling rate of 200-250Hz provided good results, without a degredation in performance. Pan Tompkins algorithm took approximately 57 seconds to run on an hour of ECG data sampled at 250Hz.
 
-< image of bad ECG signal > 
+![picture alt](images/50hz.png)
 
 #### ECG Live View
 I also created a method of viewing the ECG signal in real-time. Until this point, the device gathers and stores the ECG data in a file, which is then opened and the contents are read by the script. Using the matplotlib.animate class, a live view graph for viewing the ECG data was created. 
 
-< pic > 
+![picture alt](images/live-feed.png)
+
 
 #### QRS Detection
 I used the signal generator to produce an ECG signal at a constant 60 bpm, and sampled at 200Hz. The following images are the results of the Pan Tompkins algorithm at each stage. In the final stage, the detected _QRS_ peaks are annotated with a red dot for easy visualisation. The amplitude scale at each stage changes due to signal processing techniques, and since HRV analysis is based solely on time intervals, I decided to removed the aplitude scale from the graphs.
 
-< PT stages images > 
+![picture alt](images/pt1.png)
+![picture alt](images/pt2.png)
+![picture alt](images/pt3.png)
+![picture alt](images/pt4.png)
+![picture alt](images/pt5.png)
+![picture alt](images/pt6.png)
+
 
 
 #### HRV Analysis
@@ -227,7 +246,8 @@ RR8 | 1005
 RR9 | 1000
 RR10 | 1000
 
-< pt output > 
+
+![picture alt](images/pt-output-60bpm.png)
 
 
 The results are as expected. Examining the output of the PT algorithm shows a very consistent heartbeat with no false or missed detections. The measured heartrate is 59.9 bpm which is almost indentical to the known input of 60bpm. The other HRV analysis results - _RMSSD_, _SDNN_ and _pNNx_ - were negligable as expected, since HRV is the analysis of the **variation** in heart rate and the data used is for a fixed heart rate.
@@ -235,8 +255,8 @@ The results are as expected. Examining the output of the PT algorithm shows a ve
 
 So, I set up an experiment to gather ECG data from myself. I didn't have all the necessary equipment for a proper reading, so there is room for improvement as can be seen from the PT algorithm output below where there are a few missed or false detected beats, however the results obtained are good.
 
-< my ecg signal >
-< my pt output >
+![picture alt](images/my-ecg.png)
+![picture alt](images/my-ecg-result.png)
 
 The HRV analysis results are shown below, and there are no indications of bad cardiovascular health.
 
@@ -255,7 +275,7 @@ The results of HRV analysis are examined and compared against a list of normal r
 The results of the HRV analysis are uploaded automatically to ThingSpeak after processing has been completed. The ThingSpeak channel has four fields for each of the results in question - heart rate, RMSSD, SDNN and pNN50. The fields have
 parameters for adjusting the timescale, to average multiple results from a single period and thresholds to filter out unwanted results.
 
-< pic of thingspeak >
+![picture alt](images/thingspeak-hr.png)
 
 
 
