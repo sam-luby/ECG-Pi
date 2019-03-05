@@ -5,6 +5,9 @@ Master's project (ME Electronic &amp; Computer Engineering)
 
 **Submitted**: April 2018
 
+**Note**: This readme provides a brief overview of the project. A much more detailed outline is found in the thesis.
+
+
 ## Project Aim:
 The aim of this project was to propose and develop a solution to the problems associated with heart monitoring. The focus was on creating a novel solution for electrocardiography to provide preliminary or inital results, giving indidations of underlying cardiac issues so the patient can be referred to a cardiologist. The main consideration was to use low-cost components, which would allow the device to be used in a patient's home as well as in low income countries and regions.
 
@@ -193,8 +196,76 @@ A number of sampling rates were tested and analysed to determine if they were su
 
 < pics of different sampling rates > 
 
-As seen in the above figure, there is little difference between sampling at 250Hz and 500Hz on the ECG signal. Sampling at 50Hz however provided inconsistent results due to the undefined peak amplitude, as can be seen in the image below. I found that a sampling rate of 250Hz provided good results, without a degredation in performance. Pan Tompkins algorithm took approximately 57 seconds to run on an hour of ECG data sampled at 250Hz.
+As seen in the above figure, there is little difference between sampling at 250Hz and 500Hz on the ECG signal. Sampling at 50Hz however provided inconsistent results due to the undefined peak amplitude, as can be seen in the image below. I found that a sampling rate of 200-250Hz provided good results, without a degredation in performance. Pan Tompkins algorithm took approximately 57 seconds to run on an hour of ECG data sampled at 250Hz.
 
-<image of bad ECG signal> 
+< image of bad ECG signal > 
 
-####
+#### ECG Live View
+I also created a method of viewing the ECG signal in real-time. Until this point, the device gathers and stores the ECG data in a file, which is then opened and the contents are read by the script. Using the matplotlib.animate class, a live view graph for viewing the ECG data was created. 
+
+< pic > 
+
+#### QRS Detection
+I used the signal generator to produce an ECG signal at a constant 60 bpm, and sampled at 200Hz. The following images are the results of the Pan Tompkins algorithm at each stage. In the final stage, the detected _QRS_ peaks are annotated with a red dot for easy visualisation. The amplitude scale at each stage changes due to signal processing techniques, and since HRV analysis is based solely on time intervals, I decided to removed the aplitude scale from the graphs.
+
+< PT stages images > 
+
+
+#### HRV Analysis
+Using the same data obtained as above the intervals between successive peaks, the _RR_ intervals, are calculated. For a fixed input rate of 60 bpm, we would expect the measured intervals to all be 1 second (1000ms). A portion of the measured results are shown below:
+
+IBI | Interval (ms)
+------------ | ------------
+RR1 | 1005
+RR2 | 1000
+RR3 | 1000
+RR4 | 1005
+RR5 | 1000
+RR6 | 1000
+RR7 | 1000
+RR8 | 1005
+RR9 | 1000
+RR10 | 1000
+
+< pt output > 
+
+
+The results are as expected. Examining the output of the PT algorithm shows a very consistent heartbeat with no false or missed detections. The measured heartrate is 59.9 bpm which is almost indentical to the known input of 60bpm. The other HRV analysis results - _RMSSD_, _SDNN_ and _pNNx_ - were negligable as expected, since HRV is the analysis of the **variation** in heart rate and the data used is for a fixed heart rate.
+
+
+So, I set up an experiment to gather ECG data from myself. I didn't have all the necessary equipment for a proper reading, so there is room for improvement as can be seen from the PT algorithm output below where there are a few missed or false detected beats, however the results obtained are good.
+
+< my ecg signal >
+< my pt output >
+
+The HRV analysis results are shown below, and there are no indications of bad cardiovascular health.
+
+
+Metric | Result
+------------ | ------------
+Heart Rate (bpm) | 76.33
+RMSSD (ms) | 378
+SDNN (ms) | 313
+pNN50 (%) | 23.68%
+
+
+#### File Storage & ThingSpeak
+The results of HRV analysis are examined and compared against a list of normal results for each metric. As an example, for a measured heart rate of below 40BPM or above 120BPM - an indication of conditions called bradycardia and tachycardia respectively - means that the data is stored locally, with the filename annotated with the date and time the test was performed.
+
+The results of the HRV analysis are uploaded automatically to ThingSpeak after processing has been completed. The ThingSpeak channel has four fields for each of the results in question - heart rate, RMSSD, SDNN and pNN50. The fields have
+parameters for adjusting the timescale, to average multiple results from a single period and thresholds to filter out unwanted results.
+
+< pic of thingspeak >
+
+
+
+## Conclusion
+I believe that the project was quite successful. I succeeded in using low-cost and 'hobbyist' parts to record ECG data. I wrote an algorithm in Python to perform QRS detection which worked well, as well as code to perform HRV analysis. I increased the potential usefulness of the project by adding features like live-viewing of the signal and cloud storage of results.
+
+Two main viable applications of the project that I have identified are:
+* Low Income & Remote Areas: This project could be very beneficial to lower-income or remote areas. Remote areas located far from major hospitals which may not have access to ECG machine, or low-income countries like parts of Africa, Latin America and South-East Asia could benefit greatly from a low-cost approach such as this. The project could provide an initial diagnosis that could uncover health issues so the patient could be referred to a cardiologist.
+* Remote Monitoring: By utilising the Internet of Things and the cloud, the possible applications for this project are greatly increased. A physician or cardiologist can use this feature advantageously by performing remote monitoring. The
+patient could use the device in his/her own home for an extended period of time and by continuously uploading the analysis results to the cloud, the physician can remotely monitor the patient’s cardiovascular health.
+
+
+Although there is room for improvement, the key methodology outlines a novel approach to the problem of heart monitoring to tackle the increasing issue of cardiovascular diseases.
