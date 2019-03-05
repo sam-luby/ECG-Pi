@@ -1,5 +1,5 @@
 # RPI-Python
-Master's thesis project (ME Electronic &amp; Computer Engineering)
+Master's project (ME Electronic &amp; Computer Engineering)
 
 **Thesis title**: _IoT Device for Electrocardiography Summary Statistics Monitoring_
 
@@ -140,10 +140,61 @@ The Pan Tompkins algorithm follows the processing steps shown above.
 5. The moving average signal is used as a threshold for detecting QRS complexes. The algorithm goes though each value in the derivated signal and checks if the amplitude is greater than the moving average signal at that time, which indicates a peak is detected. The position of all detected R-peaks are stored in the results dictionary.
 
 
-Finally, the RR intervals are calculated using the positions of the detected peaks.
-The interval is measured by getting the number of samples between each pair of
-successive identified peaks and converting the interval, measured in samples, into
+Finally, the RR intervals are calculated using the positions of the detected peaks. The interval is measured by getting the number of samples between each pair of successive identified peaks and converting the interval, measured in samples, into
 a time interval measured in milliseconds.
 
 
 #### Heart Rate Variability Analysis
+The result of implementing the Pan Tompkins algorithm is a stream of impulses representing the QRS complexes of the ECG signal. The peaks are annotated and the interval between each peak - known as the _RR_ intervals - are calculated and
+stored in a list. Using this data, heart rate variability (HRV) analysis can be performed.
+
+Heart rate variability (HRV) analysis is a collection of various metrics used by cardiologists to better understand a patient's health. For this project, I picked out a selection of the most common statistics calculated with HRV analysis.
+* Heart rate (bpm) - an average of the _RR_ intervals by the number of measured beats, in minutes.
+* Root mean square of successive differences (RMSSD) - the average interval between successive QRS peaks in the ECG signal.
+* Standard deviation of intervals (SDNN) - standard deviation of the normal _NN_ (_RR_) intervals of an ECG signal.
+* pNNx - number of times in which the change in successive _NN_ intervals exceeds a certain predefined number of milliseconds, _x_, represented as a percentage of the total intervals.
+
+
+#### Analysing Results
+Once the heart rate variation analysis has been performed, the results are examined. The purpose of this is to uncover any arrhythmias or abnormalities in the data. The results are compared with a list of 'normal' values - a range for each metric for which the average healthy person's data should fall between. The ranges I used are for a 20-29 year-old male (me).
+
+<pic of metrics ranges>
+  
+Each metric calculated is tested against the given range, and if there are no abnormalities found, then the data is removed automatically. If the results are found to be abnormal, the original data is stored locally and an indication as to the diagnosis or condition is reported to the user.
+
+#### ThingSpeak
+The results of the analysis are sent automatically to the cloud. The cloud solution used for this project is ThingSpeak, an open-source IoT platform for collecting and analysing sensor data. The channel has several fields, one for each of the HRV metrics analysed, and can all be updated simultaneously for visualisation of the patient results. Using a cloud service increases the applications for this project. By having the results upload directly to the cloud automatically, remote monitoring can be performed by the cardiologist.
+
+
+## Results
+For many of the results obtained, an ECG signal generator was used. This generates a synthetic ECG signal at an adjustable rate and was used in the 3-lead configuration. Using this generator allowed me to debug and analyse efficiently, as I knew what the expected outputs should be. 
+
+
+Since one of the key focuses of the project is the cost-effectiveness, I compiled a pricelist for the main hardware components:
+
+Component | Price (euro)
+------------ | ------------
+Raspberry Pi | 36.25
+ECG Sensor |17.11 
+MCP3008 ADC | 3.55
+------------ | ------------ 
+Total | 59.61
+
+
+#### Data Collection
+During development, the results obtained using the Raspberry Pi and ADC were inconsistent and varied, while using the Arudino to collect data yielded much more accurate and consistent results. I found that this was because the Arduino uses hardware timers and a programming language based on C/C++, while on the Pi I was using Python for sampling the signal. Python uses software timers and the Pi could be performing several tasks at any one time, meaning the processor is being continually interrupted with memory management tasks etc. I rewrote the sampling software for the Raspberry Pi in C, a lower-level programming language, which allowed me to get direct control over the GPIO pins on the Pi. 
+
+The image below shows a segment of an input ECG signal recorded by the Pi, after normalisation.
+
+<pic of input ECG signal after normalisation>
+
+
+A number of sampling rates were tested and analysed to determine if they were suitable. The concern here was the trade-off between accuracy and processing time, as well as the file-size for obtained data. Ideally, a very high sampling rate would be used as it would yield the most accurate ECG signal, with a large number of samples to represent the continuous-time ECG signal as a discrete-time signal. 
+
+< pics of different sampling rates > 
+
+As seen in the above figure, there is little difference between sampling at 250Hz and 500Hz on the ECG signal. Sampling at 50Hz however provided inconsistent results due to the undefined peak amplitude, as can be seen in the image below. I found that a sampling rate of 250Hz provided good results, without a degredation in performance. Pan Tompkins algorithm took approximately 57 seconds to run on an hour of ECG data sampled at 250Hz.
+
+<image of bad ECG signal> 
+
+####
