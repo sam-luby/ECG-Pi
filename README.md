@@ -1,4 +1,4 @@
-# RPI-Python
+# ECG-Pi
 Master's project (ME Electronic &amp; Computer Engineering)
 
 **Thesis title**: _IoT Device for Electrocardiography Summary Statistics Monitoring_
